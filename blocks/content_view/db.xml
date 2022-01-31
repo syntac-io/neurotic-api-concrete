@@ -9,8 +9,8 @@
       <unsigned/>
       <key/>
     </field>
-    <field name="bContentID" type="integer">
-      <unsigned/>
+    <field name="bContentIdentifier" type="string">
+		<notnull/>
     </field>
   </table>
 </schema>
