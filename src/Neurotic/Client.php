@@ -3,6 +3,8 @@
 namespace Concrete\Package\Neurotic\Src\Neurotic;
 
 use Concrete\Core\Feed\GuzzleClient;
+use Concrete\Package\Neurotic\Src\Neurotic\Repository\Content;
+use Concrete\Package\Neurotic\Src\Neurotic\Repository\ContentType;
 
 defined('C5_EXECUTE') or die("Access Denied.");
 
@@ -37,26 +39,28 @@ class Client
 	/**
 	 * Fetch data from API.
 	 */
-	public function fetch(string $path, array $query = []): array
+	public function fetch(string $path, array $query = []): ?array
 	{
 		$cacheDir = __DIR__ . '/../../../../application/files/cache/neurotic';
-		$filePath = $cacheDir . $path . '.json';
-
-		if (!is_dir($cacheDir . '/content_type')) {
-			mkdir($cacheDir . '/content_type', 0777, true);
-		}
-		if (!is_dir($cacheDir . '/content')) {
-			mkdir($cacheDir . '/content', 0777, true);
-		}
+		$fileDir = $cacheDir . $path;
+		$filePath = $fileDir . '/index.json';
 
 		if (!file_exists($filePath)) {
-			$url = $this->origin . '/api' . $path . '?api_token=' . $this->token;
-			$response = (new GuzzleClient())->get($url);
-			
-			touch($filePath);
-			file_put_contents($filePath, $response->getBody());
+			try {
+				$url = $this->origin . '/api' . $path . '?api_token=' . $this->token;
+				$response = (new GuzzleClient())->get($url);
+				
+				if (!is_dir($fileDir)) {
+					mkdir($fileDir, 0777, true);
+				}
 
-			return json_decode($response->getBody(), true);
+				touch($filePath);
+				file_put_contents($filePath, $response->getBody());
+
+				return json_decode($response->getBody(), true);
+			} catch(\Throwable $e) {
+				dd($e);
+			}
 		}
 		
 		return json_decode(file_get_contents($filePath), true);

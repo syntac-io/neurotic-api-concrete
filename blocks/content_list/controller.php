@@ -6,9 +6,12 @@ defined('C5_EXECUTE') or die('Access Denied.');
 
 use Concrete\Core\Block\BlockController;
 use Concrete\Package\Neurotic\Src\Neurotic;
+use Concrete\Package\Neurotic\Src\Neurotic\Traits\NeuroticAwareTrait;
 
 class Controller extends BlockController
 {
+	use NeuroticAwareTrait;
+
 	/**
 	 * @var string
 	 */
@@ -46,7 +49,7 @@ class Controller extends BlockController
 	 */
 	public function view(): void
 	{
-		$contents = Neurotic::get('/content_type/' . $this->bContentTypeIdentifier . '/content');
+		$contents = $this->neurotic()->content->getByContentType($this->bContentTypeIdentifier);
 
 		$this->set('contents', $contents);
 	}
@@ -58,15 +61,10 @@ class Controller extends BlockController
 	 */
 	public function add(): void
 	{
-		$result = Neurotic::get('/content_type');
-		$contentTypes = [];
-
-		if (isset($result['items'])) {
-			foreach ($result['items'] as $contentType) {
-				$contentTypes[$contentType['identifier']] = $contentType['name'];
-			}
-			asort($contentTypes);
-		}
+		$contentTypes = collect($this->neurotic()->contentTypes->all()['items'] ?? [])
+			->mapWithKeys(function ($type) {
+				return [$type['identifier'] => $type['name']];
+			})->all();
 
 		$this->set('contentTypes', $contentTypes);
 	}

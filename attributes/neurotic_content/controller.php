@@ -6,6 +6,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
 
 use Concrete\Attribute\Text\Controller as TextAttribute;
 use Concrete\Core\Attribute\FontAwesomeIconFormatter;
+use Concrete\Package\Neurotic\Src\Neurotic\DTO\Content;
 use Concrete\Package\Neurotic\Src\Neurotic\Traits\NeuroticAwareTrait;
 
 class Controller extends TextAttribute
@@ -29,7 +30,7 @@ class Controller extends TextAttribute
 	 */
 	public function form()
 	{
-		$contentID = $this->attributeValue->getValueObject() ? $this->getValue()['identifier'] : null;
+		$contentID = $this->attributeValue->getValueObject() ? $this->getValue()->identifier : null;
 		$contentTypeID = null;
 
 		$contentTypes = collect($this->neurotic()->contentTypes->all()['items'] ?? [])
@@ -53,7 +54,7 @@ class Controller extends TextAttribute
 	/**
 	 * Get attribute value.
 	 */
-	public function getValue(): ?array
+	public function getValue(): ?Content
 	{
 		if ($value = $this->attributeValue->getValueObject()) {
 			return $this->neurotic()->content->get($value->getValue());

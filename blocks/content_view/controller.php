@@ -55,7 +55,7 @@ class Controller extends BlockController
 		$properties = [];
 
 		if ($content) {
-			$properties = (new Collection($content['properties']))
+			$properties = collect($content->properties)
 				->mapWithKeys(function ($property) {
 					return [$property['identifier'] => $property['value']];
 				})

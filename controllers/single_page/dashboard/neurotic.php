@@ -6,7 +6,6 @@ defined('C5_EXECUTE') or die('Access Denied.');
 
 use Concrete\Core\Package\Package;
 use Concrete\Core\Page\Controller\DashboardPageController;
-use Concrete\Package\Neurotic\Src\Neurotic as _Neurotic;
 
 class Neurotic extends DashboardPageController
 {
@@ -56,19 +55,6 @@ class Neurotic extends DashboardPageController
 		}
 
 		$this->set('errors', $errors);
-		$this->view();
-	}
-
-	/**
-	 * Sync Neurotic content.
-	 * 
-	 * @return void
-	 */
-	public function sync()
-	{
-		_Neurotic::sync();
-
-		$this->set('success', t('Content is successfully synced.'));
 		$this->view();
 	}
 }

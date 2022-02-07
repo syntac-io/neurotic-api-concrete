@@ -3,14 +3,6 @@
 	<?= t(sprintf('Welcome to %s v%s.', $package->getPackageName(), $package->getPackageVersion())) ?>
 </p>
 
-<!-- Actions -->
-<section class="card mb-4">
-	<h5 class="card-header"><?= t('Actions') ?></h5>
-	<div class="card-body">
-		<a href="<?= $this->action('sync') ?>" class="btn btn-success"><?= t('Sync Content') ?></a>
-	</div>
-</section>
-
 <!-- Settings -->
 <section class="card">
 	<h5 class="card-header"><?= t('Settings') ?></h5>
