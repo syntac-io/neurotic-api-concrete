@@ -68,9 +68,9 @@ class Controller extends TextAttribute
 	public function getValue()
 	{
 		if ($value = $this->attributeValue->getValueObject()) {
-			$contentID = $value->getValue();
+			$result = glob('packages/neurotic/cache/content_type/**/content/' . $value->getValue() . '.json');			
 			
-			return Neurotic::get('/content/' . $contentID);
+			return $result ? json_decode(file_get_contents($result[0]), true) : null;
 		}
 	}
 

@@ -6,6 +6,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
 
 use Concrete\Core\Block\BlockController;
 use Concrete\Package\Neurotic\Src\Neurotic;
+use Illuminate\Support\Collection;
 
 class Controller extends BlockController
 {
@@ -48,8 +49,16 @@ class Controller extends BlockController
 	{
 		$result = glob('packages/neurotic/cache/content_type/**/content/' . $this->bContentIdentifier . '.json');
 		$content = $result ? json_decode(file_get_contents($result[0]), true) : null;
+		$properties = [];
+
+		if ($content) {
+			$properties = (new Collection($content['properties']))->mapWithKeys(function ($property) {
+				return [$property['identifier'] => $property['value']];
+			})->all();
+		}
 
 		$this->set('content', $content);
+		$this->set('properties', $properties);
 	}
 
 	/**
