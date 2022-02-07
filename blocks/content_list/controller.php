@@ -6,11 +6,11 @@ defined('C5_EXECUTE') or die('Access Denied.');
 
 use Concrete\Core\Block\BlockController;
 use Concrete\Package\Neurotic\Src\Neurotic;
-use Concrete\Package\Neurotic\Src\Neurotic\Traits\NeuroticAwareTrait;
+use Concrete\Package\Neurotic\Src\Neurotic\Traits\WithNeurotic;
 
 class Controller extends BlockController
 {
-	use NeuroticAwareTrait;
+	use WithNeurotic;
 
 	/**
 	 * @var string

@@ -4,7 +4,7 @@ namespace Concrete\Package\Neurotic\Controller\SinglePage\Dashboard;
 
 defined('C5_EXECUTE') or die('Access Denied.');
 
-use Concrete\Core\Package\Package;
+use Concrete\Core\Package\PackageService;
 use Concrete\Core\Page\Controller\DashboardPageController;
 
 class Neurotic extends DashboardPageController
@@ -16,14 +16,9 @@ class Neurotic extends DashboardPageController
 	 */
     public function view()
     {
-        $package = Package::getByHandle('neurotic');
-		$config = \Core::make('config');
-		$apiToken = $config->get('neurotic.api_token');
-		$origin = $config->get('neurotic.origin');
-
-		$this->set('package', $package);
-		$this->set('apiToken', $apiToken);
-		$this->set('origin', $origin);
+        $this->set('package', $this->app->make(PackageService::class)->getByHandle('neurotic'));
+		$this->set('apiToken', \Config::get('neurotic.api_token'));
+		$this->set('origin', \Config::get('neurotic.origin'));
     }
 
 	/**
@@ -47,9 +42,8 @@ class Neurotic extends DashboardPageController
 		}
 
 		if (!$errors) {
-			$config = \Core::make('config');
-			$config->save('neurotic.api_token', $apiToken);
-			$config->save('neurotic.origin', $origin);
+			\Config::save('neurotic.api_token', $apiToken);
+			\Config::save('neurotic.origin', $origin);
 
 			$this->set('success', t('Settings are successfully saved.'));
 		}

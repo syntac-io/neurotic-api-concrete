@@ -6,13 +6,13 @@ defined('C5_EXECUTE') or die('Access Denied.');
 
 use Concrete\Core\Block\BlockController;
 use Concrete\Package\Neurotic\Src\Neurotic\Client as Neurotic;
-use Concrete\Package\Neurotic\Src\Neurotic\Traits\NeuroticAwareTrait;
+use Concrete\Package\Neurotic\Src\Neurotic\Traits\WithNeurotic;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class Controller extends BlockController
 {
-	use NeuroticAwareTrait;
+	use WithNeurotic;
 
 	/**
 	 * @var string

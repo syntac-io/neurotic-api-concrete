@@ -7,11 +7,11 @@ defined('C5_EXECUTE') or die('Access Denied.');
 use Concrete\Attribute\Text\Controller as TextAttribute;
 use Concrete\Core\Attribute\FontAwesomeIconFormatter;
 use Concrete\Package\Neurotic\Src\Neurotic\DTO\Content;
-use Concrete\Package\Neurotic\Src\Neurotic\Traits\NeuroticAwareTrait;
+use Concrete\Package\Neurotic\Src\Neurotic\Traits\WithNeurotic;
 
 class Controller extends TextAttribute
 {
-	use NeuroticAwareTrait;
+	use WithNeurotic;
 
 	/**
 	 * Get attribute icon.
@@ -20,7 +20,7 @@ class Controller extends TextAttribute
 	 */
 	public function getIconFormatter()
 	{
-		return new FontAwesomeIconFormatter('home');
+		return new FontAwesomeIconFormatter('file-alt');
 	}
 
 	/**
