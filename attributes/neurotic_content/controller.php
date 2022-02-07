@@ -6,10 +6,12 @@ defined('C5_EXECUTE') or die('Access Denied.');
 
 use Concrete\Attribute\Text\Controller as TextAttribute;
 use Concrete\Core\Attribute\FontAwesomeIconFormatter;
-use Concrete\Package\Neurotic\Src\Neurotic;
+use Concrete\Package\Neurotic\Src\Neurotic\Traits\NeuroticAwareTrait;
 
 class Controller extends TextAttribute
 {
+	use NeuroticAwareTrait;
+
 	/**
 	 * Get attribute icon.
 	 * 
@@ -27,51 +29,37 @@ class Controller extends TextAttribute
 	 */
 	public function form()
 	{
-		// Set default values
-		$contentID = null;
-		$contents = [];
+		$contentID = $this->attributeValue->getValueObject() ? $this->getValue()['identifier'] : null;
 		$contentTypeID = null;
-		$contentTypes = [];
 
-		// Set content ID if available
-		if (is_object($this->attributeValue)) {
-			$contentID = $this->attributeValue->getValue();
+		$contentTypes = collect($this->neurotic()->contentTypes->all()['items'] ?? [])
+			->mapWithKeys(function ($type) {
+				return [$type['id'] => $type['name']];
+			})->all();
+		
+		$contents = $this->neurotic()->content->all()['items'] ?? [];
+
+		if ($contentID) {
+			$content = $contents[array_search($contentID, array_column($contents, 'identifier'))];
+			$contentTypeID = $content['content_type']['id'];
 		}
 
-		// Hybernate content types and contents
-		foreach (Neurotic::get('/content_type')['items'] ?? [] as $contentType) {
-			$contentTypes[$contentType['id']] = $contentType['name'];
-			$contents[$contentType['id']] = [];
-
-			foreach (Neurotic::get('/content_type/' . $contentType['identifier'] . '/content')['items'] ?? [] as $content) {
-				$name = $content['properties'][array_search('name', array_column($content['properties'], 'identifier'))]['value'] ?? null;
-				$title = $content['properties'][array_search('title', array_column($content['properties'], 'identifier'))]['value'] ?? null;
-				$contents[$contentType['id']][$content['identifier']] = $name ?? $title ?? $content['identifier'];
-
-				// Set current content type ID
-				if ($content['identifier'] === $contentID) {
-					$contentTypeID = $contentType['id'];
-				}
-			}
-		}
-
-		// Set form variables
-		$this->set('contentID', $contentID);
-		$this->set('contents', $contents);
 		$this->set('contentTypes', $contentTypes);
+		$this->set('contents', $contents);
 		$this->set('contentTypeID', $contentTypeID);
+		$this->set('contentID', $contentID);
 	}
 
 	/**
 	 * Get attribute value.
 	 */
-	public function getValue()
+	public function getValue(): ?array
 	{
 		if ($value = $this->attributeValue->getValueObject()) {
-			$result = glob('packages/neurotic/cache/content_type/**/content/' . $value->getValue() . '.json');			
-			
-			return $result ? json_decode(file_get_contents($result[0]), true) : null;
+			return $this->neurotic()->content->get($value->getValue());
 		}
+
+		return null;
 	}
 
 	/**

@@ -5,11 +5,15 @@ namespace Concrete\Package\Neurotic\Block\ContentView;
 defined('C5_EXECUTE') or die('Access Denied.');
 
 use Concrete\Core\Block\BlockController;
-use Concrete\Package\Neurotic\Src\Neurotic;
+use Concrete\Package\Neurotic\Src\Neurotic\Client as Neurotic;
+use Concrete\Package\Neurotic\Src\Neurotic\Traits\NeuroticAwareTrait;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class Controller extends BlockController
 {
+	use NeuroticAwareTrait;
+
 	/**
 	 * @var string
 	 */
@@ -47,14 +51,15 @@ class Controller extends BlockController
 	 */
 	public function view()
 	{
-		$result = glob('packages/neurotic/cache/content_type/**/content/' . $this->bContentIdentifier . '.json');
-		$content = $result ? json_decode(file_get_contents($result[0]), true) : null;
+		$content = $this->neurotic()->content->get($this->bContentIdentifier);
 		$properties = [];
 
 		if ($content) {
-			$properties = (new Collection($content['properties']))->mapWithKeys(function ($property) {
-				return [$property['identifier'] => $property['value']];
-			})->all();
+			$properties = (new Collection($content['properties']))
+				->mapWithKeys(function ($property) {
+					return [$property['identifier'] => $property['value']];
+				})
+				->all();
 		}
 
 		$this->set('content', $content);
@@ -68,24 +73,19 @@ class Controller extends BlockController
 	 */
 	public function form()
 	{
-		$contentTypes = [];
-		$contents = [];
-		$contentTypeID = null;
 		$contentID = $this->bContentIdentifier;
+		$contentTypeID = null;
 
-		foreach (Neurotic::get('/content_type')['items'] ?? [] as $contentType) {
-			$contentTypes[$contentType['id']] = $contentType['name'];
-			$contents[$contentType['id']] = [];
+		$contentTypes = collect($this->neurotic()->contentTypes->all()['items'] ?? [])
+			->mapWithKeys(function ($type) {
+				return [$type['id'] => $type['name']];
+			})->all();
+		
+		$contents = $this->neurotic()->content->all()['items'] ?? [];
 
-			foreach (Neurotic::get('/content_type/' . $contentType['identifier'] . '/content')['items'] ?? [] as $content) {
-				$name = $content['properties'][array_search('name', array_column($content['properties'], 'identifier'))]['value'] ?? null;
-				$title = $content['properties'][array_search('title', array_column($content['properties'], 'identifier'))]['value'] ?? null;
-				$contents[$contentType['id']][$content['identifier']] = $name ?? $title ?? $content['identifier'];
-
-				if ($contentID === $content['identifier']) {
-					$contentTypeID = $contentType['id'];
-				}
-			}
+		if ($contentID) {
+			$content = $contents[array_search($contentID, array_column($contents, 'identifier'))];
+			$contentTypeID = $content['content_type']['id'];
 		}
 
 		$this->set('contentTypes', $contentTypes);

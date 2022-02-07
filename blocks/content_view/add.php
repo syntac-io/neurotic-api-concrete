@@ -3,20 +3,25 @@
 	<div class="form-group">
 		<label><?= t('Content Type') ?></label>
 		<select @change="update($el.value)" required class="form-control">
-			<option value=""><?= t('Select Content Type') ?></option>
-			<template x-for="(name, id) in contentTypes">
-				<option :value="id" :selected="id == <?= $contentTypeID ?? 'null' ?>" x-text="name"></option>
+			<option value="" disabled><?= t('Select Content Type') ?></option>
+			<?php foreach ($contentTypes as $id => $name): ?>
+				<option value="<?= $id ?>" <?= $contentTypeID === $id ? 'selected' : '' ?>><?= $name ?></option>
+			<?php endforeach; ?>
 			</template>
 		</select>
 	</div>
 
 	<!-- Content -->
-	<div x-show="listsForFields.contents" required class="form-group" style="display: none;">
+	<div x-show="contentOptions" required class="form-group" style="display: none;">
 		<label><?= t('Content') ?></label>
 		<select class="form-control" name="bContentIdentifier">
-			<option value=""><?= t('Select Content') ?></option>
-			<template x-for="(name, id) in listsForFields.contents">
-				<option :value="id" :selected="id === '<?= $bContentIdentifier ?>'" x-text="name"></option>
+			<option value="" disabled><?= t('Select Content') ?></option>
+			<template x-for="content in contentOptions">
+				<option
+					:value="content.identifier"
+					:selected="content.identifier === '<?= $contentID ?>'"
+					x-text="content.name"
+				></option>
 			</template>
 		</select>
 	</div>
@@ -24,22 +29,31 @@
 
 <script>
 	const NeuroticContentView = () => ({
-		contentTypes: <?= json_encode($contentTypes) ?>,
 		contents: <?= json_encode($contents) ?>,
-		listsForFields: {
-			contents: null,
-		},
+		contentOptions: null,
 
 		init() {
-			const contentTypeID = <?= $contentTypeID ?? 'null' ?>
-			
-			if (contentTypeID) {
-				this.update(contentTypeID)
-			}
+			const contentTypeID = <?= $contentTypeID ?? 'null' ?>;
+			if (contentTypeID) this.update(contentTypeID)
 		},
 
 		update(contentTypeID) {
-			this.listsForFields.contents = this.contents[contentTypeID]
+			let options = this.contents.filter(content => content.content_type.id == contentTypeID)
+
+			this.contentOptions = options.map(entry => {
+				let name = entry.properties.find(property => property.identifier === 'name'),
+					title = entry.properties.find(property => property.identifier === 'title'),
+					label = entry.properties.find(property => property.identifier === 'label');
+
+				name = name ? name.value : null
+				title = title ? title.value : null
+				label = label ? label.value : null
+
+				return {
+					identifier: entry.identifier,
+					name: name ?? title ?? label ?? entry.identifier,
+				}
+			})
 		}
 	})
 </script>
