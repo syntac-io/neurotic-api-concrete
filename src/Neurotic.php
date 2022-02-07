@@ -56,7 +56,7 @@ class Neurotic
 			system("rm -rf " . escapeshellarg($cachePath));
 		}
 
-		mkdir($cachePath, 0777);
+		mkdir($cachePath . '/content', 0777, true);
 		touch($cachePath . '/content_type.json');
 		file_put_contents($cachePath . '/content_type.json', json_encode($contentTypes));
 
@@ -80,6 +80,9 @@ class Neurotic
 						
 						touch($cachePath . '/content_type/' . $contentType['identifier'] . '/content/' . $content['identifier'] . '.json');
 						file_put_contents($cachePath . '/content_type/' . $contentType['identifier'] . '/content/' . $content['identifier'] . '.json', json_encode($content));
+						
+						touch($cachePath . '/content/' . $content['identifier'] . '.json');
+						file_put_contents($cachePath . '/content/' . $content['identifier'] . '.json', json_encode($content));
 					}
 				}
 			}
