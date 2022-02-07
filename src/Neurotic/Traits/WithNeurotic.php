@@ -21,8 +21,7 @@ trait WithNeurotic
 		$client = static::$client;
 
 		if (!$client instanceof Client) {
-			$config = \Config::get('neurotic');
-			static::$client = $client = new Client($config['origin'], $config['api_token']);
+			static::$client = $client = new Client(\Config::get('neurotic.origin'), \Config::get('neurotic.api_token'));
 		}
 
 		return $client;
