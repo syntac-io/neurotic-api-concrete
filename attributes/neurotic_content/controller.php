@@ -30,7 +30,7 @@ class Controller extends TextAttribute
 	 */
 	public function form()
 	{
-		$contentID = $this->attributeValue->getValueObject() ? $this->getValue()->identifier : null;
+		$contentID = $this->attributeValue ? $this->getValue()->identifier : null;
 		$contentTypeID = null;
 
 		$contentTypes = collect($this->neurotic()->contentTypes->all()['items'] ?? [])
