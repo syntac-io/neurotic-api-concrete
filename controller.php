@@ -4,6 +4,8 @@ namespace Concrete\Package\Neurotic;
 
 defined('C5_EXECUTE') or die('Access Denied.');
 
+use Concrete\Core\Attribute\Category\CategoryService;
+use Concrete\Core\Attribute\TypeFactory;
 use Concrete\Core\Block\BlockType\BlockType;
 use Concrete\Core\Block\BlockType\Set;
 use Concrete\Core\Package\Package;
@@ -56,6 +58,19 @@ class Controller extends Package
 
 		// Install single pages
 		Single::add('/dashboard/neurotic', $pkg);
+
+		// Install custom attributes
+		$typeFactory = $this->app->make(TypeFactory::class);
+		$type = $typeFactory->getByHandle('neurotic_content');
+		
+		if (!is_object($type)) {
+			$type = $typeFactory->add('neurotic_content', 'Content', $pkg);
+		}       
+
+		$this->app->make(CategoryService::class)
+			->getByHandle('collection')
+			->getController()
+			->associateAttributeKeyType($type);
 
 		// Generate configuration file
 		$config = \Core::make('config');

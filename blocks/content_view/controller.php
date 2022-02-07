@@ -46,8 +46,62 @@ class Controller extends BlockController
 	 */
 	public function view()
 	{
-		$content = Neurotic::get('/content/' . $this->bContentIdentifier);
+		$result = glob('packages/neurotic/cache/content_type/**/content/' . $this->bContentIdentifier . '.json');
+		$content = $result ? json_decode(file_get_contents($result[0]), true) : null;
 
 		$this->set('content', $content);
+	}
+
+	/**
+	 * Initialize block form.
+	 * 
+	 * @return void
+	 */
+	public function form()
+	{
+		$contentTypes = [];
+		$contents = [];
+		$contentTypeID = null;
+		$contentID = $this->bContentIdentifier;
+
+		foreach (Neurotic::get('/content_type')['items'] ?? [] as $contentType) {
+			$contentTypes[$contentType['id']] = $contentType['name'];
+			$contents[$contentType['id']] = [];
+
+			foreach (Neurotic::get('/content_type/' . $contentType['identifier'] . '/content')['items'] ?? [] as $content) {
+				$name = $content['properties'][array_search('name', array_column($content['properties'], 'identifier'))]['value'] ?? null;
+				$title = $content['properties'][array_search('title', array_column($content['properties'], 'identifier'))]['value'] ?? null;
+				$contents[$contentType['id']][$content['identifier']] = $name ?? $title ?? $content['identifier'];
+
+				if ($contentID === $content['identifier']) {
+					$contentTypeID = $contentType['id'];
+				}
+			}
+		}
+
+		$this->set('contentTypes', $contentTypes);
+		$this->set('contents', $contents);
+		$this->set('contentTypeID', $contentTypeID);
+		$this->set('contentID', $contentID);
+	}
+
+	/**
+	 * Initialize add block form.
+	 * 
+	 * @return void
+	 */
+	public function add(): void
+	{
+		$this->form();
+	}
+	
+	/**
+	 * Initialize edit block form.
+	 * 
+	 * @return void
+	 */
+	public function edit(): void
+	{
+		$this->form();
 	}
 }
