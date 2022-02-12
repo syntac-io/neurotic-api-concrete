@@ -51,6 +51,18 @@ class Controller extends BlockController
 	{
 		$contents = $this->neurotic()->content->getByContentType($this->bContentTypeIdentifier);
 
+		if ($this->query('order_by') === 'date_asc') {
+			usort($contents['items'], function ($a, $b) {
+				return $a['created_at'] > $b['created_at'] ? 1 : -1;
+			});
+		}
+		
+		if ($this->query('order_by') === 'date_desc') {
+			usort($contents['items'], function ($a, $b) {
+				return $a['created_at'] > $b['created_at'] ? -1 : 1;
+			});
+		}
+
 		$this->set('contents', $contents);
 	}
 	
