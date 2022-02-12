@@ -49,17 +49,18 @@ class Controller extends BlockController
 	 */
 	public function view(): void
 	{
-		$contents = $this->neurotic()->content->getByContentType($this->bContentTypeIdentifier);
+		$contentType = $this->neurotic()->contentTypes->get($this->bContentTypeIdentifier);
+		$contents = $contentType->contents();
 
 		if ($this->get('order_by') === 'date_asc') {
-			usort($contents['items'], function ($a, $b) {
-				return $a['created_at'] > $b['created_at'] ? 1 : -1;
+			usort($contents, function ($a, $b) {
+				return $a->created_at > $b->created_at ? 1 : -1;
 			});
 		}
 		
 		if ($this->get('order_by') === 'date_desc') {
-			usort($contents['items'], function ($a, $b) {
-				return $a['created_at'] > $b['created_at'] ? -1 : 1;
+			usort($contents, function ($a, $b) {
+				return $a->created_at > $b->created_at ? -1 : 1;
 			});
 		}
 

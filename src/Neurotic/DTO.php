@@ -2,10 +2,14 @@
 
 namespace Concrete\Package\Neurotic\Src\Neurotic;
 
+use Concrete\Package\Neurotic\Src\Neurotic\Traits\WithNeurotic;
+
 defined('C5_EXECUTE') or die("Access Denied.");
 
 class DTO
 {
+	use WithNeurotic;
+
 	/**
 	 * @var array
 	 */
